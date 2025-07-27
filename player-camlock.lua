@@ -7,6 +7,7 @@ local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
+local predictionEnabled = true
 local camlockEnabled = false
 local smoothness = 0.362
 local predictionHorizontal = 0
@@ -55,6 +56,28 @@ local corner2 = Instance.new("UICorner")
 corner2.CornerRadius = UDim.new(0, 12)
 corner2.Parent = terminateBtn
 
+local predictionBtn = Instance.new("TextButton")
+predictionBtn.Size = UDim2.new(0, 140, 0, 40)
+predictionBtn.Position = UDim2.new(0.05, 0, 1.01, 0)
+predictionBtn.BackgroundColor3 = Color3.new(0, 0, 0.3)
+predictionBtn.BackgroundTransparency = 0.3
+predictionBtn.TextColor3 = Color3.new(1, 1, 1)
+predictionBtn.Text = "Prediction: ON"
+predictionBtn.Font = Enum.Font.SourceSansBold
+predictionBtn.TextSize = 18
+predictionBtn.Active = true
+predictionBtn.Draggable = true
+predictionBtn.Parent = screenGui
+
+local corner3 = Instance.new("UICorner")
+corner3.CornerRadius = UDim.new(0, 12)
+corner3.Parent = predictionBtn
+
+predictionBtn.MouseButton1Click:Connect(function()
+	predictionEnabled = not predictionEnabled
+	predictionBtn.Text = predictionEnabled and "Prediction: ON" or "Prediction: OFF"
+end)
+
 camlockBtn.MouseButton1Click:Connect(function()
 	camlockEnabled = not camlockEnabled
 	camlockBtn.Text = camlockEnabled and "Camlock: ON" or "Camlock: OFF"
@@ -63,6 +86,10 @@ end)
 
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
 	if gameProcessed then return end
+			if input.KeyCode == Enum.KeyCode.Home then
+		predictionEnabled = not predictionEnabled
+		predictionBtn.Text = predictionEnabled and "Prediction: ON" or "Prediction: OFF"
+	end
 	if input.KeyCode == Enum.KeyCode.Y then
 		camlockEnabled = not camlockEnabled
 		camlockBtn.Text = camlockEnabled and "Camlock: ON" or "Camlock: OFF"
@@ -117,7 +144,7 @@ renderConn = RunService.RenderStepped:Connect(function()
 			velocity.Z * predictionHorizontal
 		)
 
-		local predictedPosition = head.Position + predictionOffset
+		local predictedPosition = head.Position + (predictionEnabled and predictionOffset or Vector3.zero)
 
 		local shakeOffset = Vector3.new(
 			(math.random() - 0.5) * shakeX,
